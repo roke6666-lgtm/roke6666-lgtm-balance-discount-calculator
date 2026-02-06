@@ -114,6 +114,12 @@
             <div class="tt">할인(지원)금액(원) = 일 이자 × 적용일수</div>
             <div class="vv mono" id="discount">-</div>
           </div>
+
+          <!-- 추가: 최종 납부금액 -->
+          <div class="box">
+            <div class="tt">최종 납부금액(원) = 잔금금액 − 할인(지원)금액</div>
+            <div class="vv mono" id="finalPay">-</div>
+          </div>
         </div>
 
         <div class="hint" id="detail"></div>
@@ -207,8 +213,8 @@
 
     const rate = ratePct / 100;
     const perDayRaw = (amount * rate) / 365;
-    // 예시처럼 '원 단위 버림'이 필요할 수 있어 선택지를 줘도 되지만,
-    // 우선 예시와 최대한 비슷하게 Math.floor 적용
+
+    // 예시처럼 "일 이자"를 원 단위로 버림(floor) 처리
     const perDay = Math.floor(perDayRaw);
 
     let appliedDays = 0;
@@ -238,9 +244,13 @@
 
     const discount = perDay * appliedDays;
 
+    // 추가: 최종 납부금액(음수 방지)
+    const finalPay = Math.max(0, amount - discount);
+
     $("perDay").textContent = fmtMoney(perDay) + " 원";
     $("days").textContent = fmtMoney(appliedDays) + " 일";
     $("discount").textContent = fmtMoney(discount) + " 원";
+    $("finalPay").textContent = fmtMoney(finalPay) + " 원";
 
     // 조건 체크: 최소 금액
     if (amount < minAmount){
@@ -283,6 +293,7 @@
 - 일 이자: ${$("perDay").textContent}
 - 적용일수: ${$("days").textContent}
 - 할인(지원)금액: ${$("discount").textContent}
+- 최종 납부금액: ${$("finalPay").textContent}
 - 상세: ${$("detail").textContent}`;
     try{
       await navigator.clipboard.writeText(txt);
